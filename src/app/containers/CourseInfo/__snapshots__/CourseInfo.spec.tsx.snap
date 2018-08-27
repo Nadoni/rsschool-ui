@@ -3,9 +3,9 @@
 exports[`Course renders correctly 1`] = `
 <CourseInfo
   courseId="1"
-  courseMentors={Array []}
   courseStudents={Array []}
   fetchCourseMentors={[Function]}
   fetchCourseStudents={[Function]}
+  updateStudentMentors={[Function]}
 />
 `;

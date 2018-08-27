@@ -15,6 +15,8 @@ storiesOf('Course', module)
                 courseStudents={[]}
                 fetchCourseMentors={noop}
                 fetchCourseStudents={noop}
+                isLoading={false}
+                updateStudentMentors={noop}
             />
         );
     });

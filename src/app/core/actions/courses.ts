@@ -5,8 +5,9 @@ import {
     assignMentorsToStudents,
     getCourseStudents,
     getCourseMentors,
+    renewalStudentMentors,
 } from 'core/api';
-import { ICourse } from 'core/models';
+import { ICourse, ICourseStudent } from 'core/models';
 
 export function fetchAllCourses() {
     return async (dispatch: any) => {
@@ -87,6 +88,7 @@ export function fetchCourseStudents(courseId: string) {
         }
     };
 }
+
 export function fetchCourseMentors(courseId: string) {
     return async (dispatch: any) => {
         dispatch({
@@ -102,6 +104,26 @@ export function fetchCourseMentors(courseId: string) {
         } catch (e) {
             dispatch({
                 type: COURSE.FETCH_MENTORS_FAIL,
+            });
+        }
+    };
+}
+
+export function updateStudentMentors(courseId: string, data: Partial<ICourseStudent>) {
+    return async (dispatch: any) => {
+        dispatch({
+            type: COURSE.UPDATE_STUDENT_MENTORS,
+        });
+
+        try {
+            await renewalStudentMentors(courseId, data);
+            dispatch({
+                type: COURSE.UPDATE_STUDENT_MENTORS_OK,
+            });
+            await dispatch(fetchCourseStudents(courseId));
+        } catch (e) {
+            dispatch({
+                type: COURSE.UPDATE_STUDENT_MENTORS_FAIL,
             });
         }
     };

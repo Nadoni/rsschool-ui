@@ -7,12 +7,14 @@ type InputType = 'text' | 'tel' | 'email' | 'date' | 'datetime-local' | 'select'
 class ReduxFormInput extends React.PureComponent<React.InputHTMLAttributes<HTMLInputElement> & WrappedFieldProps> {
     render() {
         const {
+            disabled,
             input,
             label,
             type,
             placeholder,
             pattern,
             required,
+            readOnly,
             className,
             children,
             min,
@@ -25,10 +27,12 @@ class ReduxFormInput extends React.PureComponent<React.InputHTMLAttributes<HTMLI
                 {label ? <Label className={required ? 'field-required' : ''}>{label}</Label> : null}
                 <Input
                     {...input}
+                    disabled={disabled}
                     type={type as InputType}
                     placeholder={placeholder}
                     pattern={pattern}
                     required={required}
+                    readOnly={readOnly}
                     valid={touched && valid}
                     invalid={touched && invalid}
                     className={className}

@@ -5,6 +5,7 @@ export interface IProfile {
     englishLevel: string;
     firstName: string;
     firstNameNative: string;
+    githubId: string;
     isInternshipNeeded: boolean;
     isWorkNeeded: boolean;
     lastName: string;

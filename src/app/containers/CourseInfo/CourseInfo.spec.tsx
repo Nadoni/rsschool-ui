@@ -22,6 +22,8 @@ describe('Course', () => {
                 courseStudents={[]}
                 fetchCourseMentors={noop}
                 fetchCourseStudents={noop}
+                isLoading={false}
+                updateStudentMentors={noop}
             />,
         );
         expect(output).toMatchSnapshot();
