@@ -28,6 +28,13 @@ export function assignMentorsToStudents(courseId: string) {
 export function getCourseStudents(courseId: string): Promise<ICourseStudent[]> {
     return axios.get<CourseStudentsResponse>(`/api/course/${courseId}/students`).then(response => response.data.data);
 }
+
+export function getCourseStudentsByMentor(courseId: string): Promise<ICourseStudent[]> {
+    return axios
+        .get<CourseStudentsResponse>(`/api/course/${courseId}/mentor-students`)
+        .then(response => response.data.data);
+}
+
 export function getCourseMentors(courseId: string): Promise<ICourseMentor[]> {
     return axios.get<CourseMentorsResponse>(`/api/course/${courseId}/mentors`).then(response => response.data.data);
 }

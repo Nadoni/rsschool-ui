@@ -1,12 +1,14 @@
 import * as React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import Admin from '../Admin';
+import Mentor from '../Mentor';
 import Courses from '../Courses';
 import CourseInfo from '../CourseInfo';
 import Schedule from '../Schedule';
 import Home from '../Home';
 import Layout from '../Layout';
 import Profile from '../Profile';
+import MentorStudentsView from '../MentorStudentsView';
 
 const App = (): JSX.Element => {
     return (
@@ -18,9 +20,11 @@ const App = (): JSX.Element => {
 
                 <Route exact={true} path="/course/:id/schedule" component={Schedule} />
                 <Route exact={true} path="/course/:id/info" component={CourseInfo} />
+                <Route exact={true} path="/course/:id/mentor-students" component={MentorStudentsView} />
 
                 <Route exact={true} path="/profile" component={Profile} />
                 <Route exact={true} path="/admin" component={Admin} />
+                <Route exact={true} path="/mentor" component={Mentor} />
             </Layout>
         </Switch>
     );

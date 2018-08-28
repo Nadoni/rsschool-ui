@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Field, InjectedFormProps, reduxForm } from 'redux-form';
-import { Modal, ModalHeader, ModalBody, FormGroup, Label, ModalFooter, Row, Button, Form } from 'reactstrap';
-import VirtualizedSelect from 'react-virtualized-select';
+import { Modal, ModalHeader, ModalBody, FormGroup, ModalFooter, Row, Button, Form } from 'reactstrap';
 
 import 'react-select/dist/react-select.css';
 import 'react-virtualized/styles.css';
@@ -13,11 +12,9 @@ type ModalEditCourseStudentProps = {
     studentData: ICourseStudent | undefined;
     isOpen: boolean;
     onCloseModal: () => void;
-    studentsOptions: { [key: string]: string | number }[];
-    mentorsOptions: { [key: string]: string | number }[];
 };
 
-class ModalEditCourseStudent extends React.Component<
+class ModalDeleteCourseStudent extends React.Component<
     ModalEditCourseStudentProps & InjectedFormProps<{}, ModalEditCourseStudentProps>
 > {
     onCloseModal = () => {
@@ -26,11 +23,11 @@ class ModalEditCourseStudent extends React.Component<
     };
 
     render() {
-        const { isOpen, mentorsOptions, pristine, submitting, handleSubmit } = this.props;
+        const { isOpen, submitting, handleSubmit } = this.props;
         return (
             <Modal fade={true} centered={true} isOpen={isOpen} toggle={this.onCloseModal} size="lg">
                 <Form onSubmit={handleSubmit}>
-                    <ModalHeader toggle={this.onCloseModal}>Edit course student</ModalHeader>
+                    <ModalHeader toggle={this.onCloseModal}>Delete course student</ModalHeader>
                     <ModalBody>
                         <FormGroup>
                             <Field
@@ -77,30 +74,6 @@ class ModalEditCourseStudent extends React.Component<
                                 type="text"
                             />
                         </FormGroup>
-                        <FormGroup>
-                            <Field
-                                name="selectMentors"
-                                type="select"
-                                component={(props: any) => (
-                                    <React.Fragment>
-                                        <Label>Select mentors for student</Label>
-                                        <VirtualizedSelect
-                                            label="Select mentors for student"
-                                            options={mentorsOptions}
-                                            {...props.input}
-                                            multi={true}
-                                            placeholder="Choose mentor (Default: Without mentor)"
-                                            onChange={props.input.onChange}
-                                            onBlur={() => {
-                                                return props.input.onBlur(props.input.value);
-                                            }}
-                                            onBlurResetsInput={false}
-                                            value={props.input.value}
-                                        />
-                                    </React.Fragment>
-                                )}
-                            />
-                        </FormGroup>
                     </ModalBody>
                     <ModalFooter>
                         <Row className="text-right">
@@ -108,8 +81,8 @@ class ModalEditCourseStudent extends React.Component<
                                 <Button color="secondary" onClick={this.onCloseModal}>
                                     Cancel
                                 </Button>{' '}
-                                <Button color="success" type="submit" disabled={pristine || submitting}>
-                                    Save
+                                <Button color="danger" type="submit" disabled={submitting}>
+                                    Confirm Delete
                                 </Button>
                             </FormGroup>
                         </Row>
@@ -121,6 +94,6 @@ class ModalEditCourseStudent extends React.Component<
 }
 
 export default reduxForm<{}, ModalEditCourseStudentProps>({
-    form: 'editCourseStudentForm',
+    form: 'deleteCourseStudentForm',
     enableReinitialize: true,
-})(ModalEditCourseStudent);
+})(ModalDeleteCourseStudent);

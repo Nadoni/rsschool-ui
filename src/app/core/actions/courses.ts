@@ -6,8 +6,10 @@ import {
     getCourseStudents,
     getCourseMentors,
     renewalStudentMentors,
+    getCourseStudentsByMentor,
 } from 'core/api';
 import { ICourse, ICourseStudent } from 'core/models';
+import { FetchSettings } from '../constants';
 
 export function fetchAllCourses() {
     return async (dispatch: any) => {
@@ -109,7 +111,7 @@ export function fetchCourseMentors(courseId: string) {
     };
 }
 
-export function updateStudentMentors(courseId: string, data: Partial<ICourseStudent>) {
+export function updateStudentMentors(courseId: string, data: Partial<ICourseStudent>, options: FetchSettings) {
     return async (dispatch: any) => {
         dispatch({
             type: COURSE.UPDATE_STUDENT_MENTORS,
@@ -120,10 +122,35 @@ export function updateStudentMentors(courseId: string, data: Partial<ICourseStud
             dispatch({
                 type: COURSE.UPDATE_STUDENT_MENTORS_OK,
             });
-            await dispatch(fetchCourseStudents(courseId));
+            if (options === FetchSettings.Many) {
+                await dispatch(fetchCourseStudents(courseId));
+            }
+            if (options === FetchSettings.One) {
+                await dispatch(fetchStudentsByCurrentMentor(courseId));
+            }
         } catch (e) {
             dispatch({
                 type: COURSE.UPDATE_STUDENT_MENTORS_FAIL,
+            });
+        }
+    };
+}
+
+export function fetchStudentsByCurrentMentor(courseId: string) {
+    return async (dispatch: any) => {
+        dispatch({
+            type: COURSE.FETCH_STUDENTS_BY_CURRENT_MENTOR,
+        });
+
+        try {
+            const data = await getCourseStudentsByMentor(courseId);
+            dispatch({
+                type: COURSE.FETCH_STUDENTS_BY_CURRENT_MENTOR_OK,
+                payload: data,
+            });
+        } catch (e) {
+            dispatch({
+                type: COURSE.FETCH_STUDENTS_BY_CURRENT_MENTOR_FAIL,
             });
         }
     };

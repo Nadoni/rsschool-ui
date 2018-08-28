@@ -4,52 +4,33 @@ import ReactTable from 'react-table';
 
 import 'react-table/react-table.css';
 import { Button } from 'reactstrap';
-import ModalEditCourseStudent from './ModalEditCourseStudent';
-import matchSorter from 'match-sorter';
+import ModalDeleteCourseStudent from './ModalDeleteCourseStudent';
 import { FetchSettings } from '../../core/constants';
 
 type Props = {
-    courseStudents: ICourseStudent[];
-    courseMentors: ICourseMentor[];
+    studentsToMentor: ICourseMentor[];
+    username: string;
     updateStudentMentors: (courseId: string, data: Partial<ICourseStudent>, options: FetchSettings) => void;
 };
 
 type CourseStudentsState = {
     studentData: ICourseStudent | undefined;
     isOpenModalEdit: boolean;
-    studentsOptions: { [key: string]: string | number }[];
-    mentorsOptions: { [key: string]: string | number }[];
     initialValues: any;
 };
 
-class CourseStudents extends React.PureComponent<Props, CourseStudentsState> {
+class CourseStudentsByMentor extends React.PureComponent<Props, CourseStudentsState> {
     state: CourseStudentsState = {
         studentData: undefined,
         isOpenModalEdit: false,
-        studentsOptions: [],
-        mentorsOptions: [],
         initialValues: undefined,
     };
 
-    makeOptionsFromData = (data: Array<ICourseStudent | ICourseMentor>, mark: string) => {
-        const makeOptionsFromData = data.map((courseMember: ICourseStudent | ICourseMentor) => {
-            return { label: courseMember.userId, value: courseMember.userId };
-        });
-        this.setState(prevState => ({
-            // hack, can't ensure that key is in StateKeys
-            ...prevState,
-            [mark]: makeOptionsFromData,
-        }));
-    };
-
     componentDidUpdate(prevProps: Props, prevState: CourseStudentsState) {
-        if (this.props.courseStudents !== prevProps.courseStudents) {
-            this.makeOptionsFromData(this.props.courseStudents, 'studentsOptions');
-        }
-        if (this.props.courseMentors !== prevProps.courseMentors) {
-            this.makeOptionsFromData(this.props.courseMentors, 'mentorsOptions');
-        }
-        if (this.state.studentData !== prevState.studentData) {
+        if (
+            this.state.studentData !== prevState.studentData ||
+            this.props.studentsToMentor !== prevProps.studentsToMentor
+        ) {
             if (this.state.studentData !== undefined) {
                 this.getInitialStudent();
             }
@@ -96,88 +77,68 @@ class CourseStudents extends React.PureComponent<Props, CourseStudentsState> {
     handleSubmitStudentData = async (props: any) => {
         const { selectMentors, studentGithubId, courseId } = props;
         const data = {
-            mentors: selectMentors.map(({ value }: { value: string }) => ({ _id: value })),
+            mentors: selectMentors
+                .map(({ value }: { value: string }) => ({ _id: value }))
+                .filter(({ _id }: { _id: string }) => _id !== this.props.username),
             userId: studentGithubId,
         };
-        await this.props.updateStudentMentors(courseId, data, FetchSettings.Many);
+        await this.props.updateStudentMentors(courseId, data, FetchSettings.One);
         this.onCloseModalEditCourseStudent();
     };
 
     render() {
-        const { isOpenModalEdit, studentData, studentsOptions, mentorsOptions, initialValues } = this.state;
+        const { isOpenModalEdit, studentData, initialValues } = this.state;
+        const { studentsToMentor } = this.props;
         return (
             <React.Fragment>
-                <h3 className="mb-3"> Students</h3>
+                <h3 className="mb-3">Your Students</h3>
 
                 <ReactTable
-                    data={this.props.courseStudents}
-                    defaultPageSize={100}
+                    data={studentsToMentor}
+                    defaultPageSize={10}
                     filterable={true}
                     columns={[
                         {
                             Header: 'Github Username',
-                            id: 'id',
                             accessor: 'user._id',
-                            filterMethod: (filter: any, rows: Array<object>): any => {
-                                return matchSorter(rows, filter.value, { keys: ['id'] });
-                            },
-                            filterAll: true,
                         },
                         {
                             Header: 'First Name',
-                            id: 'firstName',
                             accessor: 'user.profile.firstName',
-                            filterMethod: (filter: any, rows: Array<object>): any => {
-                                return matchSorter(rows, filter.value, { keys: ['firstName'] });
-                            },
-                            filterAll: true,
                         },
                         {
                             Header: 'Last Name',
-                            id: 'lastName',
                             accessor: 'user.profile.lastName',
-                            filterMethod: (filter: any, rows: Array<object>): any => {
-                                return matchSorter(rows, filter.value, { keys: ['lastName'] });
-                            },
-                            filterAll: true,
                         },
                         {
                             Header: 'City',
-                            id: 'city',
                             accessor: 'user.profile.city',
-                            filterMethod: (filter: any, rows: Array<object>): any => {
-                                return matchSorter(rows, filter.value, { keys: ['city'] });
-                            },
-                            filterAll: true,
                         },
                         {
                             Header: 'Mentors',
-                            id: 'mentors',
+                            id: 'mentors._id',
                             accessor: (student: ICourseStudent) => student.mentors.map((i: any) => i._id).join(', '),
-                            filterMethod: (filter: any, rows: Array<object>): any => {
-                                return matchSorter(rows, filter.value, { keys: ['mentors'] });
-                            },
-                            filterAll: true,
                         },
                         {
-                            Header: 'Edit',
+                            Header: 'Delete',
                             sortable: false,
                             filterable: false,
                             Cell: ({ original }) => (
-                                <Button className="btn btn-info action-button" onClick={this.toggleModalEdit(original)}>
-                                    Edit
+                                <Button
+                                    className="btn btn-danger action-button"
+                                    onClick={this.toggleModalEdit(original)}
+                                >
+                                    Delete
                                 </Button>
                             ),
                         },
                     ]}
                     className="-striped -highlight"
                 />
-                <ModalEditCourseStudent
+                <ModalDeleteCourseStudent
                     isOpen={isOpenModalEdit}
                     onCloseModal={this.onCloseModalEditCourseStudent}
                     studentData={studentData}
-                    studentsOptions={studentsOptions}
-                    mentorsOptions={mentorsOptions}
                     initialValues={initialValues}
                     onSubmit={this.handleSubmitStudentData}
                 />
@@ -186,4 +147,4 @@ class CourseStudents extends React.PureComponent<Props, CourseStudentsState> {
     }
 }
 
-export default CourseStudents;
+export default CourseStudentsByMentor;
